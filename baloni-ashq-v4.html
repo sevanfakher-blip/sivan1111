@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>🩷</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 50% 35%, #231533 0%, #140c1f 65%, #0d0814 100%);
+      color: #ffffff;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Ambient floating bokeh dots */
+    .ambient-particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bokeh {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 77, 136, 0.35) 0%, rgba(255, 77, 136, 0) 70%);
+      animation: driftUp linear infinite;
+    }
+
+    @keyframes driftUp {
+      0% {
+        transform: translateY(105vh) scale(0.8);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.6;
+      }
+      80% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    /* Top Header Card */
+    .header-card {
+      position: relative;
+      z-index: 20;
+      margin-top: 26px;
+      width: 90%;
+      max-width: 420px;
+      padding: 22px 20px 24px;
+      border-radius: 28px;
+      background: rgba(36, 24, 50, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 92, 138, 0.25);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      text-align: center;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .header-card.hidden {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.96);
+      pointer-events: none;
+    }
+
+    .header-title {
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #ff5c8a;
+      text-shadow: 0 0 18px rgba(255, 92, 138, 0.45);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-subtitle {
+      font-size: 0.92rem;
+      color: #dfd6ea;
+      font-weight: 400;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    /* Progress Pill */
+    .progress-wrapper {
+      position: relative;
+      width: 68%;
+      max-width: 240px;
+      height: 30px;
+      margin: 0 auto;
+      border-radius: 999px;
+      background: rgba(18, 11, 27, 0.85);
+      border: 1px solid rgba(255, 92, 138, 0.35);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #ff2a6d 0%, #ff5c8a 100%);
+      border-radius: 999px;
+      transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 0 14px rgba(255, 51, 102, 0.6);
+    }
+
+    .progress-text {
+      position: relative;
+      z-index: 2;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.2px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Game Play Area */
+    #game-area {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    /* Floating Heart Balloon */
+    .heart-balloon {
+      position: absolute;
+      bottom: -90px;
+      width: 68px;
+      height: 68px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 6px 16px rgba(255, 42, 109, 0.45));
+      transition: transform 0.12s ease;
+      will-change: transform, bottom;
+    }
+
+    .heart-balloon:active {
+      transform: scale(0.88);
+    }
+
+    .heart-balloon svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Floating Romantic Phrase Pill */
+    .phrase-pill {
+      position: fixed;
+      z-index: 15;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(29, 19, 41, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 85, 135, 0.55);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45), 0 0 16px rgba(255, 65, 120, 0.28);
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.7);
+      opacity: 0;
+      animation: floatPhrase 2.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes floatPhrase {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -30%) scale(0.7);
+      }
+      14% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.04);
+      }
+      24% {
+        transform: translate(-50%, -58%) scale(1);
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -145px) scale(0.96);
+      }
+    }
+
+    /* Pop Burst Particles */
+    .pop-particle {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 14;
+      animation: burstOut 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes burstOut {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0.2);
+      }
+    }
+
+    /* Realistic Bouquet Gift Overlay */
+    .gift-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.85s ease;
+    }
+
+    .gift-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bouquet-stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: scale(0.6) translateY(35px);
+      transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .gift-overlay.visible .bouquet-stage {
+      transform: scale(1) translateY(0);
+    }
+
+    .gift-caption {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ff7aa2;
+      text-shadow: 0 2px 18px rgba(255, 65, 120, 0.65), 0 0 32px rgba(255, 182, 193, 0.35);
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+      text-align: center;
+      animation: captionGlow 2.8s ease-in-out infinite;
+    }
+
+    @keyframes captionGlow {
+      0%, 100% {
+        transform: scale(1);
+        text-shadow: 0 2px 18px rgba(255, 65, 120, 0.65);
+      }
+      50% {
+        transform: scale(1.04);
+        text-shadow: 0 4px 26px rgba(255, 92, 138, 0.9);
+      }
+    }
+
+    .bouquet-visual {
+      position: relative;
+      width: 290px;
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: gentleFloat 3.8s ease-in-out infinite 0.9s;
+    }
+
+    @keyframes gentleFloat {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-10px) rotate(1.2deg);
+      }
+    }
+
+    .bouquet-glow {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 60, 120, 0.45) 0%, rgba(255, 182, 193, 0.14) 55%, rgba(255, 77, 136, 0) 78%);
+      filter: blur(16px);
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        transform: scale(0.95);
+        opacity: 0.78;
+      }
+      50% {
+        transform: scale(1.12);
+        opacity: 1;
+      }
+    }
+
+    .bouquet-svg {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 22px 36px rgba(0, 0, 0, 0.72));
+    }
+
+    .sparkle {
+      position: absolute;
+      font-size: 1.35rem;
+      pointer-events: none;
+      z-index: 3;
+      animation: twinkle 2.4s ease-in-out infinite;
+    }
+
+    .s1 { top: 15px; right: 20px; animation-delay: 0s; }
+    .s2 { top: 32px; left: 16px; animation-delay: 0.7s; }
+    .s3 { bottom: 85px; right: 14px; animation-delay: 1.3s; }
+    .s4 { bottom: 95px; left: 14px; animation-delay: 1.8s; }
+
+    @keyframes twinkle {
+      0%, 100% {
+        transform: scale(0.6) rotate(0deg);
+        opacity: 0.35;
+      }
+      50% {
+        transform: scale(1.25) rotate(20deg);
+        opacity: 1;
+      }
+    }
+
+    /* Restart Button below Bouquet */
+    .restart-btn {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 26px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff2a6d 0%, #ff5c8a 100%);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 42, 109, 0.45);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 10;
+    }
+
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(255, 42, 109, 0.6);
+    }
+
+    .restart-btn:active {
+      transform: scale(0.96);
+    }
+
+    .restart-btn svg {
+      width: 17px;
+      height: 17px;
+      transition: transform 0.4s ease;
+    }
+
+    .restart-btn:hover svg {
+      transform: rotate(-180deg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Bokeh Background -->
+  <div class="ambient-particles" id="ambientParticles"></div>
+
+  <!-- Top Header & Score Card -->
+  <header class="header-card" id="headerCard">
+    <h1 class="header-title">🩷</h1>
+    <p class="header-subtitle">دڵەکان بتەقێنە تا سوپرایزە شاراوەکەت بۆت دەربکەوێت</p>
+    <div class="progress-wrapper">
+      <div class="progress-fill" id="progressFill"></div>
+      <span class="progress-text" id="progressText">خاڵ: 0 / 10</span>
+    </div>
+  </header>
+
+  <!-- Interactive Floating Hearts Layer -->
+  <main id="game-area"></main>
+
+  <!-- Realistic Flower Bouquet Gift Overlay -->
+  <section class="gift-overlay" id="giftOverlay" aria-hidden="true">
+    <div class="bouquet-stage">
+      <h2 class="gift-caption">بۆ جوانترین کەس❤️</h2>
+
+      <div class="bouquet-visual">
+        <div class="bouquet-glow"></div>
+        <span class="sparkle s1">✨</span>
+        <span class="sparkle s2">✨</span>
+        <span class="sparkle s3">🌹</span>
+        <span class="sparkle s4">✨</span>
+
+        <!-- Realistic Photorealistic Vector Rose Bouquet -->
+        <svg class="bouquet-svg" viewBox="0 0 360 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Luxury Kraft & Blush Wrapping Paper Gradients -->
+            <linearGradient id="wrapBackOuter" x1="180" y1="75" x2="180" y2="400" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f7dce4" />
+              <stop offset="55%" stop-color="#e8b8c6" />
+              <stop offset="100%" stop-color="#c48a9c" />
+            </linearGradient>
+            <linearGradient id="wrapBackInner" x1="180" y1="85" x2="180" y2="250" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#4a1525" />
+              <stop offset="100%" stop-color="#260912" />
+            </linearGradient>
+            <linearGradient id="wrapLeftFold" x1="55" y1="175" x2="185" y2="410" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#fff0f4" />
+              <stop offset="45%" stop-color="#f2c4d2" />
+              <stop offset="100%" stop-color="#c98b9e" />
+            </linearGradient>
+            <linearGradient id="wrapRightFold" x1="305" y1="175" x2="175" y2="410" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f5cad7" />
+              <stop offset="50%" stop-color="#dfa0b3" />
+              <stop offset="100%" stop-color="#b06f83" />
+            </linearGradient>
+            <linearGradient id="goldTrim" x1="60" y1="150" x2="300" y2="280" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ffe7a3" />
+              <stop offset="50%" stop-color="#d4af37" />
+              <stop offset="100%" stop-color="#aa821c" />
+            </linearGradient>
+
+            <!-- Botanical Leaf Gradients -->
+            <linearGradient id="leafDark" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3b6e4c" />
+              <stop offset="55%" stop-color="#21472e" />
+              <stop offset="100%" stop-color="#112919" />
+            </linearGradient>
+            <linearGradient id="leafMid" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#58946b" />
+              <stop offset="55%" stop-color="#2f6340" />
+              <stop offset="100%" stop-color="#193b24" />
+            </linearGradient>
+
+            <!-- Velvet Crimson Rose Gradients -->
+            <radialGradient id="crimsonOuter" cx="42%" cy="32%" r="68%">
+              <stop offset="0%" stop-color="#e6194b" />
+              <stop offset="50%" stop-color="#9e082b" />
+              <stop offset="85%" stop-color="#5e0318" />
+              <stop offset="100%" stop-color="#38010d" />
+            </radialGradient>
+            <radialGradient id="crimsonMid" cx="45%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#ff3b6b" />
+              <stop offset="48%" stop-color="#bd0d38" />
+              <stop offset="90%" stop-color="#6e041d" />
+              <stop offset="100%" stop-color="#470111" />
+            </radialGradient>
+            <radialGradient id="crimsonInner" cx="48%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#ff6b8e" />
+              <stop offset="45%" stop-color="#d41342" />
+              <stop offset="85%" stop-color="#800523" />
+              <stop offset="100%" stop-color="#4a0112" />
+            </radialGradient>
+
+            <!-- Soft Blush Pink Rose Gradients -->
+            <radialGradient id="blushOuter" cx="42%" cy="32%" r="68%">
+              <stop offset="0%" stop-color="#ffd6e2" />
+              <stop offset="55%" stop-color="#e88aa6" />
+              <stop offset="90%" stop-color="#b55270" />
+              <stop offset="100%" stop-color="#87354e" />
+            </radialGradient>
+            <radialGradient id="blushMid" cx="45%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#fff0f5" />
+              <stop offset="50%" stop-color="#f5a6be" />
+              <stop offset="90%" stop-color="#c76582" />
+              <stop offset="100%" stop-color="#964059" />
+            </radialGradient>
+            <radialGradient id="blushInner" cx="48%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="48%" stop-color="#ffc2d4" />
+              <stop offset="90%" stop-color="#d4728f" />
+              <stop offset="100%" stop-color="#9e445f" />
+            </radialGradient>
+
+            <!-- Silk Satin Ribbon Gradient -->
+            <linearGradient id="satinSilk" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#b80d37" />
+              <stop offset="30%" stop-color="#ff3366" />
+              <stop offset="50%" stop-color="#ff85a3" />
+              <stop offset="72%" stop-color="#c9123f" />
+              <stop offset="100%" stop-color="#6e041e" />
+            </linearGradient>
+
+            <filter id="petalShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#1a0208" flood-opacity="0.55" />
+            </filter>
+            <filter id="paperShadow" x="-15%" y="-15%" width="130%" height="130%">
+              <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#2b0813" flood-opacity="0.45" />
+            </filter>
+
+            <!-- Reusable Detailed Crimson Rose -->
+            <g id="realisticRedRose" filter="url(#petalShadow)">
+              <path d="M0 -38 C22 -40, 40 -22, 36 0 C40 22, 22 40, 0 38 C-22 40, -40 22, -36 0 C-40 -22, -22 -40, 0 -38 Z" fill="url(#crimsonOuter)" />
+              <path d="M-28 -20 C-38 -6, -36 16, -20 28 C-8 38, 10 38, 22 26 C36 16, 38 -6, 26 -20 C16 -36, -14 -36, -28 -20 Z" fill="url(#crimsonOuter)" />
+              <path d="M-22 -12 C-28 4, -18 22, 0 24 C18 26, 28 8, 22 -10 C16 -26, -16 -26, -22 -12 Z" fill="url(#crimsonMid)" stroke="#ff7597" stroke-width="0.7" stroke-opacity="0.55" />
+              <path d="M-18 4 C-12 22, 12 24, 20 6 C26 -8, 14 -20, -2 -20 C-16 -20, -24 -6, -18 4 Z" fill="url(#crimsonMid)" stroke="#ff85a3" stroke-width="0.7" stroke-opacity="0.5" />
+              <path d="M-14 -12 C-20 -2, -12 14, 2 16 C14 18, 20 2, 14 -12 C6 -22, -10 -22, -14 -12 Z" fill="url(#crimsonInner)" stroke="#ff99b2" stroke-width="0.75" stroke-opacity="0.6" />
+              <path d="M-10 -4 C-12 5, -3 11, 5 9 C13 7, 14 -3, 7 -9 C1 -14, -8 -10, -10 -4 Z" fill="url(#crimsonInner)" stroke="#ffb3c6" stroke-width="0.8" stroke-opacity="0.65" />
+              <path d="M-4 -2 C-5 3, 0 5, 3 3 C5 1, 4 -3, 1 -4 C-2 -5, -4 -3, -4 -2 Z" fill="#9e082b" stroke="#ffd6e0" stroke-width="0.85" stroke-opacity="0.75" />
+            </g>
+
+            <!-- Reusable Detailed Blush Pink Rose -->
+            <g id="realisticPinkRose" filter="url(#petalShadow)">
+              <path d="M0 -36 C20 -38, 38 -20, 34 0 C38 20, 20 38, 0 36 C-20 38, -38 20, -34 0 C-38 -20, -20 -38, 0 -36 Z" fill="url(#blushOuter)" />
+              <path d="M-26 -18 C-36 -4, -34 14, -18 26 C-6 34, 8 34, 20 24 C34 14, 36 -4, 24 -18 C14 -34, -12 -34, -26 -18 Z" fill="url(#blushOuter)" />
+              <path d="M-20 -10 C-26 4, -16 20, 0 22 C16 24, 26 6, 20 -8 C14 -24, -14 -24, -20 -10 Z" fill="url(#blushMid)" stroke="#ffffff" stroke-width="0.75" stroke-opacity="0.65" />
+              <path d="M-16 4 C-10 20, 10 22, 18 6 C24 -6, 12 -18, -2 -18 C-14 -18, -22 -6, -16 4 Z" fill="url(#blushMid)" stroke="#ffffff" stroke-width="0.75" stroke-opacity="0.6" />
+              <path d="M-12 -10 C-18 -2, -10 12, 2 14 C12 16, 18 2, 12 -10 C6 -20, -8 -20, -12 -10 Z" fill="url(#blushInner)" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.7" />
+              <path d="M-8 -3 C-10 4, -3 10, 5 8 C11 6, 12 -2, 6 -8 C1 -12, -7 -9, -8 -3 Z" fill="url(#blushInner)" stroke="#ffffff" stroke-width="0.85" stroke-opacity="0.75" />
+              <path d="M-3 -2 C-4 2, 0 5, 3 3 C5 1, 4 -3, 1 -5 C-2 -6, -3 -3, -3 -2 Z" fill="#d4728f" stroke="#ffffff" stroke-width="0.9" stroke-opacity="0.85" />
+            </g>
+          </defs>
+
+          <!-- Back Wrapping Paper Silhouette & Gold Edge -->
+          <path d="M56 156 L180 68 L304 156 L180 395 Z" fill="url(#wrapBackOuter)" stroke="url(#goldTrim)" stroke-width="2.2" />
+          <path d="M72 162 L180 84 L288 162 L180 295 Z" fill="url(#wrapBackInner)" />
+
+          <!-- Botanical Foliage -->
+          <g transform="translate(90, 138) rotate(-32)">
+            <path d="M0 0 C-16 -22, -12 -52, 0 -64 C12 -52, 16 -22, 0 0 Z" fill="url(#leafDark)" />
+            <path d="M0 -4 L0 -58" stroke="#6aa37d" stroke-width="1.2" opacity="0.6" />
+          </g>
+          <g transform="translate(74, 172) rotate(-54)">
+            <path d="M0 0 C-15 -20, -10 -46, 0 -56 C10 -46, 15 -20, 0 0 Z" fill="url(#leafMid)" />
+            <path d="M0 -4 L0 -50" stroke="#8ec4a0" stroke-width="1.2" opacity="0.6" />
+          </g>
+          <g transform="translate(270, 138) rotate(32)">
+            <path d="M0 0 C-16 -22, -12 -52, 0 -64 C12 -52, 16 -22, 0 0 Z" fill="url(#leafDark)" />
+            <path d="M0 -4 L0 -58" stroke="#6aa37d" stroke-width="1.2" opacity="0.6" />
+          </g>
+          <g transform="translate(286, 172) rotate(54)">
+            <path d="M0 0 C-15 -20, -10 -46, 0 -56 C10 -46, 15 -20, 0 0 Z" fill="url(#leafMid)" />
+            <path d="M0 -4 L0 -50" stroke="#8ec4a0" stroke-width="1.2" opacity="0.6" />
+          </g>
+
+          <!-- Baby's Breath -->
+          <g opacity="0.92">
+            <path d="M106 142 Q86 112 74 94" stroke="#7aa389" stroke-width="1.4" fill="none" />
+            <circle cx="74" cy="94" r="3.2" fill="#ffffff" />
+            <circle cx="82" cy="101" r="2.6" fill="#ffe8ef" />
+            <circle cx="66" cy="105" r="2.8" fill="#ffffff" />
+            <path d="M254 142 Q274 112 286 94" stroke="#7aa389" stroke-width="1.4" fill="none" />
+            <circle cx="286" cy="94" r="3.2" fill="#ffffff" />
+            <circle cx="278" cy="101" r="2.6" fill="#ffe8ef" />
+            <circle cx="294" cy="105" r="2.8" fill="#ffffff" />
+            <path d="M180 108 L180 78" stroke="#7aa389" stroke-width="1.4" fill="none" />
+            <circle cx="180" cy="78" r="3.2" fill="#ffffff" />
+            <circle cx="172" cy="85" r="2.6" fill="#ffe8ef" />
+            <circle cx="188" cy="85" r="2.6" fill="#ffffff" />
+          </g>
+
+          <!-- Roses Arrangement -->
+          <use href="#realisticRedRose" transform="translate(180, 116) scale(0.92)" />
+          <use href="#realisticPinkRose" transform="translate(130, 130) scale(0.88) rotate(-15)" />
+          <use href="#realisticPinkRose" transform="translate(230, 130) scale(0.88) rotate(15)" />
+
+          <use href="#realisticRedRose" transform="translate(98, 166) scale(0.86) rotate(-20)" />
+          <use href="#realisticRedRose" transform="translate(152, 158) scale(0.98) rotate(-5)" />
+          <use href="#realisticRedRose" transform="translate(208, 158) scale(0.98) rotate(5)" />
+          <use href="#realisticRedRose" transform="translate(262, 166) scale(0.86) rotate(20)" />
+
+          <use href="#realisticPinkRose" transform="translate(124, 194) scale(0.92) rotate(-8)" />
+          <use href="#realisticRedRose" transform="translate(180, 196) scale(1.02)" />
+          <use href="#realisticPinkRose" transform="translate(236, 194) scale(0.92) rotate(8)" />
+
+          <!-- Front Overlapping Wrapping Sheets -->
+          <path d="M52 176 L184 256 L180 400 L100 305 Z" fill="url(#wrapLeftFold)" stroke="url(#goldTrim)" stroke-width="1.8" filter="url(#paperShadow)" />
+          <path d="M308 176 L176 256 L180 400 L260 305 Z" fill="url(#wrapRightFold)" stroke="url(#goldTrim)" stroke-width="1.8" filter="url(#paperShadow)" />
+          <path d="M180 256 L180 400" stroke="rgba(120, 45, 70, 0.35)" stroke-width="1.8" />
+
+          <!-- Silk Satin Ribbon & Bow -->
+          <g filter="url(#petalShadow)">
+            <path d="M174 278 C152 310, 132 342, 116 372 L134 364 L144 380 C154 350, 166 314, 178 284 Z" fill="url(#satinSilk)" />
+            <path d="M186 278 C208 310, 228 342, 244 372 L226 364 L216 380 C206 350, 194 314, 182 284 Z" fill="url(#satinSilk)" />
+            <path d="M136 266 Q180 286 224 266 L220 282 Q180 302 140 282 Z" fill="url(#satinSilk)" />
+            <path d="M176 274 C138 240, 108 262, 122 286 C135 304, 166 290, 176 279 Z" fill="url(#satinSilk)" />
+            <path d="M184 274 C222 240, 252 262, 238 286 C225 304, 194 290, 184 279 Z" fill="url(#satinSilk)" />
+            <rect x="169" y="266" width="22" height="20" rx="7" fill="url(#satinSilk)" stroke="#ff85a3" stroke-width="1" />
+          </g>
+        </svg>
+      </div>
+
+      <!-- Restart / Play Again Button -->
+      <button class="restart-btn" id="restartBtn" type="button">
+        <span>دووبارە دەستپێبکەرەوە</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <script>
+    const TARGET_SCORE = 10;
+    const ROMANTIC_PHRASES = [
+      "ڕۆحی من 🌸",
+      "هەتاهەتایم ♾️",
+      "تاقانەکەم 🧸",
+      "چاوجوانەکەم ✨",
+      "هەموو ژیانم ❤️",
+      "دڵ و گیانم 🦋",
+      "گوڵ و ژیانم 🌹",
+      "شازادەکەم 👑",
+      "خۆشەویستەکەم 💌",
+      "هەموو دنیام 💖"
+    ];
+
+    let score = 0;
+    let isGameOver = false;
+    let spawnTimer = null;
+    let activeHearts = new Set();
+    let audioCtx = null;
+
+    const headerCard = document.getElementById("headerCard");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+    const gameArea = document.getElementById("game-area");
+    const giftOverlay = document.getElementById("giftOverlay");
+    const restartBtn = document.getElementById("restartBtn");
+    const ambientParticles = document.getElementById("ambientParticles");
+
+    // Create subtle floating background particles
+    function initAmbientParticles() {
+      for (let i = 0; i < 18; i++) {
+        const dot = document.createElement("div");
+        dot.className = "bokeh";
+        const size = Math.random() * 14 + 6;
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${Math.random() * 100}%`;
+        dot.style.animationDuration = `${Math.random() * 10 + 9}s`;
+        dot.style.animationDelay = `${Math.random() * 10}s`;
+        ambientParticles.appendChild(dot);
+      }
+    }
+
+    // Soft pop sound synthesized via Web Audio API
+    function playPopSound() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        const now = audioCtx.currentTime;
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.13);
+      } catch (e) {
+        // Ignore audio errors if blocked
+      }
+    }
+
+    function updateScoreUI() {
+      progressText.textContent = `خاڵ: ${score} / ${TARGET_SCORE}`;
+      const pct = Math.min((score / TARGET_SCORE) * 100, 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    function createBurst(x, y) {
+      const colors = ["#ff2a6d", "#ff5c8a", "#ff8fab", "#ffd166", "#ffffff"];
+      for (let i = 0; i < 14; i++) {
+        const p = document.createElement("div");
+        p.className = "pop-particle";
+        const angle = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.4;
+        const dist = 35 + Math.random() * 45;
+        p.style.left = `${x}px`;
+        p.style.top = `${y}px`;
+        p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        p.style.setProperty("--tx", `${Math.cos(angle) * dist}px`);
+        p.style.setProperty("--ty", `${Math.sin(angle) * dist}px`);
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 680);
+      }
+    }
+
+    function showPhrase(x, y, text) {
+      const pill = document.createElement("div");
+      pill.className = "phrase-pill";
+      pill.textContent = text;
+
+      const clampedX = Math.max(95, Math.min(window.innerWidth - 95, x));
+      const clampedY = Math.max(170, Math.min(window.innerHeight - 60, y));
+
+      pill.style.left = `${clampedX}px`;
+      pill.style.top = `${clampedY}px`;
+      document.body.appendChild(pill);
+      setTimeout(() => pill.remove(), 2850);
+    }
+
+    function spawnHeart() {
+      if (isGameOver) return;
+
+      const heart = document.createElement("div");
+      heart.className = "heart-balloon";
+
+      const size = 60 + Math.random() * 18;
+      heart.style.width = `${size}px`;
+      heart.style.height = `${size}px`;
+
+      const startX = 24 + Math.random() * (window.innerWidth - size - 48);
+      heart.style.left = `${startX}px`;
+
+      const gradId = `heartGrad_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+      heart.innerHTML = `
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="${gradId}" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ff6b98" />
+              <stop offset="55%" stop-color="#ff2e63" />
+              <stop offset="100%" stop-color="#d91648" />
+            </linearGradient>
+          </defs>
+          <path d="M32 56.5C32 56.5 6 40.2 6 21.8C6 13.5 12.5 7 20.5 7C25.4 7 29.7 9.5 32 13.3C34.3 9.5 38.6 7 43.5 7C51.5 7 58 13.5 58 21.8C58 40.2 32 56.5 32 56.5Z" fill="url(#${gradId})" />
+          <path d="M16 16.5C18.2 13.6 21.8 12.5 24.5 13" stroke="rgba(255,255,255,0.45)" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      `;
+
+      gameArea.appendChild(heart);
+      activeHearts.add(heart);
+
+      const speed = 1.45 + Math.random() * 1.15;
+      const swayAmp = 14 + Math.random() * 18;
+      const swayFreq = 0.018 + Math.random() * 0.012;
+      const swayPhase = Math.random() * Math.PI * 2;
+      let bottomPos = -size - 10;
+      let frame = 0;
+      let popped = false;
+
+      function animateHeart() {
+        if (popped || !heart.parentNode) return;
+        frame++;
+        bottomPos += speed;
+        const offsetX = Math.sin(frame * swayFreq + swayPhase) * swayAmp;
+        const tilt = Math.cos(frame * swayFreq + swayPhase) * 6;
+
+        heart.style.bottom = `${bottomPos}px`;
+        heart.style.transform = `translateX(${offsetX}px) rotate(${tilt}deg)`;
+
+        if (bottomPos > window.innerHeight + 90) {
+          activeHearts.delete(heart);
+          heart.remove();
+          return;
+        }
+        requestAnimationFrame(animateHeart);
+      }
+
+      const handlePop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (popped || isGameOver) return;
+        popped = true;
+
+        const rect = heart.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        activeHearts.delete(heart);
+        heart.remove();
+
+        playPopSound();
+        createBurst(centerX, centerY);
+
+        const phraseIndex = score % ROMANTIC_PHRASES.length;
+        showPhrase(centerX, centerY, ROMANTIC_PHRASES[phraseIndex]);
+
+        score++;
+        updateScoreUI();
+
+        if (score >= TARGET_SCORE) {
+          triggerWin();
+        }
+      };
+
+      heart.addEventListener("pointerdown", handlePop);
+      requestAnimationFrame(animateHeart);
+    }
+
+    function triggerWin() {
+      isGameOver = true;
+      clearInterval(spawnTimer);
+
+      activeHearts.forEach((h) => {
+        h.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+        h.style.opacity = "0";
+        h.style.transform += " scale(0.7)";
+        setTimeout(() => h.remove(), 420);
+      });
+      activeHearts.clear();
+      document.querySelectorAll(".phrase-pill").forEach((p) => p.remove());
+
+      setTimeout(() => {
+        headerCard.classList.add("hidden");
+        giftOverlay.classList.add("visible");
+        giftOverlay.setAttribute("aria-hidden", "false");
+      }, 350);
+    }
+
+    function startGame() {
+      score = 0;
+      isGameOver = false;
+      updateScoreUI();
+
+      giftOverlay.classList.remove("visible");
+      giftOverlay.setAttribute("aria-hidden", "true");
+      headerCard.classList.remove("hidden");
+
+      activeHearts.forEach((h) => h.remove());
+      activeHearts.clear();
+      document.querySelectorAll(".phrase-pill").forEach((p) => p.remove());
+
+      clearInterval(spawnTimer);
+      spawnHeart();
+      setTimeout(spawnHeart, 450);
+      spawnTimer = setInterval(spawnHeart, 780);
+    }
+
+    restartBtn.addEventListener("click", startGame);
+
+    initAmbientParticles();
+    startGame();
+  </script>
+</body>
+</html>
